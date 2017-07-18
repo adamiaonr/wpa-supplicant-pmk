@@ -1,15 +1,15 @@
 # wpa-supplicant-pmk
-custom version of wpa_supplicant (v1.0, 2012-05-10), written **FOR RESEARCH PURPOSES ONLY**. 
+custom version of `wpa_supplicant` (v1.0, 2012-05-10), written **FOR RESEARCH PURPOSES ONLY**. 
 
 it prints the PMK during a WPA2 authentication procedure. this PMK can then be used on Wireshark to decrypt WiFi data frames. 
 
-this custom version of wpa_supplicant was tested w/ the following platforms:
+this custom version of `wpa_supplicant` was tested w/ the following platforms:
 * raspberry pi model B+, V1 2, running Raspbian GNU/Linux 7 (wheezy)
 * wireshark v2.2.3-0-g57531cd, running on Mac OSX El Capitan 10.11.5 (15F34)
 
 # usage
 
-after compilation, run the resulting wpa_supplicant binary as follows, to initiate a connection to a WPA2 Enterprise WiFi network:
+after compilation, run the resulting `wpa_supplicant` binary as follows, to initiate a connection to a WPA2 Enterprise WiFi network:
 
 ```
 pi@raspberrypi $ sudo /<custom-wpa-supplicant-dir>/wpa_supplicant -Dwext -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf 
@@ -40,7 +40,18 @@ wlan0: CTRL-EVENT-CONNECTED - Connection to xx:xx:xx:xx:xx:xx completed (auth) [
 ```
 # cross-compilation details
 
-this custom version of wpa_supplicant was cross-compiled to run on a raspberry pi model B+, V1 2, running Raspbian GNU/Linux 7 (wheezy). i've added a special [defconfig-raspberry-pi](https://github.com/adamiaonr/wpa-supplicant-pmk/blob/master/wpa_supplicant/defconfig-raspberry-pi) file with the configurations to compile wpa_supplicant.
+this custom version of `wpa_supplicant` was cross-compiled to run on a raspberry pi model B+, V1 2, running Raspbian GNU/Linux 7 (wheezy). i've added a special [defconfig-raspberry-pi](https://github.com/adamiaonr/wpa-supplicant-pmk/blob/master/wpa_supplicant/defconfig-raspberry-pi) file with the configurations to cross-compile `wpa_supplicant`. this assumes that you have an appropriate toolchain installed in your host system, check [this guide](https://www.raspberrypi.org/documentation/linux/kernel/building.md) if you're not sure.
+
+using the provided `defconfig-raspberry-pi` file, the cross-compilation of `wpa_supplicant` should go fine with the following commands:
+```
+cd <WORKING_DIR>
+git clone https://github.com/adamiaonr/wpa-supplicant-pmk.git
+cd wpa-supplicant-pmk/wpa_supplicant
+cp defconfig-raspberry-pi .config
+make
+```
+
+the `wpa_supplicant` binary should be present on `wpa-supplicant-pmk/wpa_supplicant/wpa_supplicant`.
 
 the cross compilation was based [on this guide](http://www.fabriziodini.eu/posts/cross_compile_tutorial/), and requires part of the target's filesystem (in my case, a raspberry pi) to be present your host machine. for me, this included:
 * copying `/usr` and `/lib` from the raspberry pi into a directory on the host machine. this directory - with path `<SYSROOT_DIR>` - then becomes the so-called `sysroot`.
