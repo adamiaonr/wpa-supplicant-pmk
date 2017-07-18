@@ -458,9 +458,27 @@ static void wpa_sm_start_preauth(void *eloop_ctx, void *timeout_ctx)
 static void wpa_supplicant_key_neg_complete(struct wpa_sm *sm,
 					    const u8 *addr, int secure)
 {
+	// pass the pmk (pairwise master key) to a hex string.
+	int i;
+	// hex str to hold pmk. 1024 bit 
+	// should be enough (the pmk is supposed to be 256 bit, thus 32 byte, thus 
+	// 64 hex chars)
+	char pmk_str[1024] = {'\0'};
+	char * pmk_ptr = pmk_str;
+	// use os_snprintf() (as used by other methods in wpa.c)
+	for (i = 0; i < sm->pmk_len; i++) {
+		// wpa_msg(sm->ctx->msg_ctx, MSG_INFO,
+		// 	"WPA: pmk[%d]: %02X", i, sm->pmk[i]);
+		pmk_ptr += sprintf(pmk_ptr, "%02X", sm->pmk[i]);
+	}
+	*(pmk_ptr + 1) = '\0';
+
 	wpa_msg(sm->ctx->msg_ctx, MSG_INFO,
-		"WPA: Key negotiation completed with "
-		MACSTR " [PTK=%s GTK=%s]", MAC2STR(addr),
+		"WPA: Key negotiation completed with "MACSTR": \
+		\n\tPMK=%s \
+		\n\t[PTK=%s GTK=%s]", 
+		MAC2STR(addr),
+		pmk_str,
 		wpa_cipher_txt(sm->pairwise_cipher),
 		wpa_cipher_txt(sm->group_cipher));
 	wpa_sm_cancel_auth_timeout(sm);
